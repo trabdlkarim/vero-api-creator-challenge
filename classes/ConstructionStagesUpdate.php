@@ -8,7 +8,7 @@ class ConstructionStagesUpdate extends stdClass
 
 			$vars = [
 				'name',
-				'stardDate',
+				'startDate',
 				'endDate',
 				'duration',
 				'durationUnit',
