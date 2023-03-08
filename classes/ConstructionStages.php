@@ -2,6 +2,9 @@
 
 class ConstructionStages
 {
+	use ValidatesConstructionStage,
+		CalculatesConstructionStageDuration;
+
 	private $db;
 
 	public function __construct()
@@ -67,6 +70,16 @@ class ConstructionStages
 	 */
 	public function post(ConstructionStagesCreate $data)
 	{
+		$errors = $this->validate($data);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if (!$data->duration && $data->startDate && $data->endDate) {
+			$data->duration = $this->getStageDuration($data->startDate, $data->endDate, $data->durationUnit);
+		}
+
 		$stmt = $this->db->prepare("
 			INSERT INTO construction_stages
 			    (name, start_date, end_date, duration, durationUnit, color, externalId, status)
@@ -94,16 +107,27 @@ class ConstructionStages
 	 */
 	public function patch(ConstructionStagesUpdate $data, $id)
 	{
-		if (isset($data->status) && !in_array($data->status, ['NEW', 'PLANNED', 'DELETED'])) {
-			return [
-				'error' => 'The specified status is invalid',
-			];
+		$stage = $this->getSingle($id);
+
+		if (count($stage) == 0) {
+			http_response_code(404);
 		}
 
 		$vars = get_object_vars($data);
 
 		if (count($vars) == 0) {
 			http_response_code(400);
+		}
+
+		$errors = $this->validate($vars);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if (!$data->duration && $data->startDate && $data->endDate) {
+			$durationUnit = $data->durationUnit ?: ($stage[0]['durationUnit'] ?: 'DAYS');
+			$vars['duration'] = $this->getStageDuration($data->startDate, $data->endDate, $durationUnit);
 		}
 
 		$sql = "UPDATE construction_stages SET ";
@@ -122,7 +146,7 @@ class ConstructionStages
 					$sql .= "end_date = :end_date, ";
 					break;
 				default:
-					$params[$name] = $data->$name;
+					$params[$name] = $value;
 					$sql .= $name . " = :" . $name . ", ";
 			}
 		}
