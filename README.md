@@ -54,3 +54,9 @@ Add a nice phpDoc to every method you create!
 ## Bonus task:
 Add a system which generates a documentation out of your API!
 
+## Generating the API documentation
+To generate the API documentation just run the following command from the terminal:
+
+```sh
+php apidoc
+```
