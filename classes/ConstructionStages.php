@@ -125,7 +125,7 @@ class ConstructionStages
 			return $errors;
 		}
 
-		if (!$data->duration && $data->startDate && $data->endDate) {
+		if (!isset($data->duration) && $data->startDate && $data->endDate) {
 			$durationUnit = $data->durationUnit ?: ($stage[0]['durationUnit'] ?: 'DAYS');
 			$vars['duration'] = $this->getStageDuration($data->startDate, $data->endDate, $durationUnit);
 		}
