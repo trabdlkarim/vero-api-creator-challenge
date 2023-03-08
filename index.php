@@ -37,11 +37,22 @@ class Api
 				'method' => 'post',
 				'bodyType' => 'ConstructionStagesCreate'
 			],
+			'patch constructionStages/(:num)' => [
+				'class' => 'ConstructionStages',
+				'method' => 'patch',
+				'bodyType' => 'ConstructionStagesUpdate'
+			],
+			'delete constructionStages/(:num)' => [
+				'class' => 'ConstructionStages',
+				'method' => 'delete',
+			],
 		];
 
 		$response = [
 			'error' => 'No such route',
 		];
+         
+		//echo json_encode(json_decode(file_get_contents('php://input')));
 
 		if ($uri) {
 
@@ -50,7 +61,7 @@ class Api
 				if (preg_match('#^'.$pattern.'$#i', "{$httpVerb} {$uri}", $matches)) {
 					$params = [];
 					array_shift($matches);
-					if ($httpVerb === 'post') {
+					if (($httpVerb === 'post') || ($httpVerb === 'patch')) {
 						$data = json_decode(file_get_contents('php://input'));
 						$params = [new $target['bodyType']($data)];
 					}
