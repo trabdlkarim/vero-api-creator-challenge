@@ -51,8 +51,6 @@ class Api
 		$response = [
 			'error' => 'No such route',
 		];
-         
-		//echo json_encode(json_decode(file_get_contents('php://input')));
 
 		if ($uri) {
 
